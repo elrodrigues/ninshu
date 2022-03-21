@@ -25,7 +25,8 @@ This path must be an absolute/full path.
 
 func check(e error, cmd string) {
 	if e != nil {
-		panic(fmt.Errorf("Cannot find help page for %s\n", cmd))
+		fmt.Printf("Cannot find help page for %s\n", cmd)
+		os.Exit(2)
 	}
 }
 
