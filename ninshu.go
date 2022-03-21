@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+
 	// "flag"
 	// "errors"
 	// "strings"
+	"elrodrigues.com/ninshu/com"
+	"github.com/spf13/viper"
 )
 
 var tag = "v0.1"
+var configPath = "~/.ninshu/ninshu.json"
 var help_msg = `Ninshu Client is a tool for interacting with your Ninshu network
 
 Usage:
@@ -20,7 +24,7 @@ The commands are:
 	configure	configure Ninshu client settings
 	connect		connect to Ninshu network
 	version		prints Ninshu version
-	help		prints this help message
+	help		prints this help message or command info
 
 Use "ninshu help <command>" for more information about a command
 `
@@ -32,6 +36,20 @@ func main() {
 		fmt.Println(help_msg)
 		os.Exit(2)
 	}
+	// load config file
+	viper.SetDefault("ninRootPath", "")
+	viper.SetConfigName("ninshu")
+	viper.SetConfigType("json")
+	viper.AddConfigPath("$HOME/.ninshu")
+	// viper.AddConfigPath("/etc/ninshu/")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			panic(fmt.Errorf("Fatal error reading ninshu config file: %w\n", err))
+		}
+	}
+	os.Setenv("ninRootPath", viper.GetString("ninRootPath"))
+	// parse command
 	switch args[0] {
 	case "configure":
 		fmt.Println("Configure Ninshu client and network")
@@ -40,7 +58,11 @@ func main() {
 	case "version":
 		fmt.Printf("Ninshu %s へようこそ\n", tag)
 	case "help":
-		fmt.Println(help_msg)
+		if len(args) < 2 {
+			fmt.Println(help_msg)
+		} else {
+			com.FetchHelp(args[1:])
+		}
 	case "tskr":
 		fmt.Println(help_msg)
 	default:
