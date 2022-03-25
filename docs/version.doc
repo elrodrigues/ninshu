@@ -1,3 +1,6 @@
-THIS IS A TEST
+Prints the version of Ninshu in your system. This is useful for checking if Ninshu is correctly installed and 
+configured.
 
-VERSION DOC
+Usage:
+    ninshu version
+

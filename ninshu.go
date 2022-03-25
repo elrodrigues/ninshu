@@ -11,9 +11,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var tag = "v0.1"
-var configPath = "~/.ninshu/ninshu.json"
-var help_msg = `Ninshu Client is a tool for interacting with your Ninshu network
+const (
+	tag        = "v0.1"
+	configPath = "~/.ninshu/ninshu.json"
+	help_msg   = `Ninshu Client is a tool for interacting with your Ninshu network
 
 Usage:
 
@@ -27,13 +28,15 @@ The commands are:
 	help		prints this help message or command info
 
 Use "ninshu help <command>" for more information about a command
+
 `
+)
 
 func main() {
 	args := os.Args[1:] // ignore script location
 
 	if len(args) < 1 {
-		fmt.Println(help_msg)
+		fmt.Fprint(os.Stderr, help_msg)
 		os.Exit(2)
 	}
 	// load config file
@@ -59,14 +62,14 @@ func main() {
 		fmt.Printf("Ninshu %s へようこそ\n", tag)
 	case "help":
 		if len(args) < 2 {
-			fmt.Println(help_msg)
+			fmt.Print(help_msg)
 		} else {
 			com.FetchHelp(args[1:])
 		}
 	case "tskr":
-		fmt.Println(help_msg)
+		fmt.Print(help_msg)
 	default:
-		fmt.Println(help_msg)
+		fmt.Fprint(os.Stderr, help_msg)
 		os.Exit(2)
 	}
 }
