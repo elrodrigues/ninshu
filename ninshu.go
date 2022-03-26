@@ -7,7 +7,7 @@ import (
 	// "flag"
 	// "errors"
 	// "strings"
-	"elrodrigues.com/ninshu/com"
+	"github.com/elrodrigues/ninshu/com"
 	"github.com/spf13/viper"
 )
 
@@ -22,6 +22,7 @@ Usage:
 
 The commands are:
 
+	anchor		create a Ninshu client
 	configure	configure Ninshu client settings
 	connect		connect to Ninshu network
 	version		prints Ninshu version
