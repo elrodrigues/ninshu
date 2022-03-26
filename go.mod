@@ -1,4 +1,4 @@
-module elrodrigues.com/ninshu
+module github.com/elrodrigues/ninshu
 
 go 1.18
 
