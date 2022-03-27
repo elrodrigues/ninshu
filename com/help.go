@@ -32,7 +32,7 @@ func check(e error, cmd string) {
 
 // FetchHelp fetches the relevant documentation for a command.
 //
-// Ninshu's `ninDocPath' environment variable must be set to the
+// Ninshu's `ninRootPath' environment variable must be set to the
 // documentation's directory for this function to work correctly.
 func FetchHelp(args []string) {
 	path := os.Getenv("ninRootPath")
