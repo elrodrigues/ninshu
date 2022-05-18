@@ -1,20 +1,25 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"os"
+	"time"
 
 	// "flag"
 	// "errors"
 	// "strings"
 	"github.com/elrodrigues/ninshu/com"
+	pb "github.com/elrodrigues/ninshud/jutsu"
 	"github.com/spf13/viper"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
-	tag        = "v0.1"
-	configPath = "~/.ninshu/ninshu.json"
-	help_msg   = `Ninshu Client is a tool for interacting with your Ninshu network
+	tag      = "v0.1"
+	help_msg = `Ninshu Client is a tool for interacting with your Ninshu network
 
 Usage:
 
@@ -27,10 +32,15 @@ The commands are:
 	connect		connect to Ninshu network
 	version		prints Ninshu version
 	help		prints this help message or command info
+	ping		pong
 
 Use "ninshu help <command>" for more information about a command
 
 `
+)
+
+var (
+	addr = "localhost:47001" // fixed for now
 )
 
 func main() {
@@ -69,6 +79,21 @@ func main() {
 		}
 	case "tskr":
 		fmt.Print(help_msg)
+	case "ping":
+		conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			log.Fatalf("Could not dial-in to server: %v\n Is the daemon running?", err)
+		}
+		defer conn.Close()
+		c := pb.NewClusterClient(conn)
+		// Contact daemon
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		r, err := c.PingNode(ctx, &pb.HelloRequest{Ping: args[1]})
+		if err != nil {
+			log.Fatalf("RPC failed: %v\n", err)
+		}
+		fmt.Println(r.Pong)
 	default:
 		fmt.Fprint(os.Stderr, help_msg)
 		os.Exit(2)
