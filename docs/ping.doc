@@ -1,0 +1,5 @@
+Client attempts to ping Ninshu daemon with your string. Successful if server replies with your string.
+
+Usage:
+    ninshu ping <string>
+

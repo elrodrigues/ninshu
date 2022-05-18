@@ -12,10 +12,12 @@ var usage = `Usage:
 
 The commands are:
 
+	anchor		create a Ninshu client
 	configure	configure Ninshu client settings
 	connect		connect to Ninshu network
 	version		prints Ninshu version
 	help		prints this help message or command info
+	ping		pong
 `
 
 var pathmsg = `Please configure Ninshu's root path!
