@@ -1,0 +1,9 @@
+Creates or destroys a fixed node in Ninshu's network
+
+Usage:
+    ninshu anchor <command>
+    
+Commands:
+    drop    - creates your fixed point in the network (like dropping an anchor)
+    raise   - destroys your fixed point in the network (like raising an anchor)
+

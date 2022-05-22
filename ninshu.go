@@ -30,6 +30,7 @@ The commands are:
 	anchor		create a Ninshu client
 	configure	configure Ninshu client settings
 	connect		connect to Ninshu network
+	disconnect	disconnect from Ninshu network
 	version		prints Ninshu version
 	help		prints this help message or command info
 	ping		pong
@@ -42,6 +43,84 @@ Use "ninshu help <command>" for more information about a command
 var (
 	addr = "localhost:47001" // fixed for now
 )
+
+func anchor(args []string) {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Could not dial-in to server: %v\n Is the daemon running?", err)
+	}
+	defer conn.Close()
+	c := pb.NewClusterClient(conn)
+	// Contact daemon
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	switch args[1] {
+	case "drop":
+		r, err := c.DropAnchor(ctx, &pb.EmptyRequest{})
+		if err != nil {
+			log.Fatalf("RPC failed: %v\n", err)
+		}
+		if r.Success {
+			fmt.Println("Successfully dropped Ninshu anchor")
+		} else {
+			log.Fatalf("Failed to drop Ninshu anchor")
+		}
+	case "raise":
+		r, err := c.RaiseAnchor(ctx, &pb.EmptyRequest{})
+		if err != nil {
+			log.Fatalf("RPC failed: %v\n", err)
+		}
+		if r.Success {
+			fmt.Println("Successfully raised Ninshu anchor")
+		} else {
+			log.Fatalf("Failed to raise Ninshu anchor")
+		}
+	default:
+		com.FetchHelp(args)
+	}
+}
+
+func connectTo(ip string) {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Could not dial-in to server: %v\n Is the daemon running?", err)
+	}
+	defer conn.Close()
+	c := pb.NewClusterClient(conn)
+	// Contact daemon
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	r, err := c.ConnectTo(ctx, &pb.ConnectRequest{Ip: ip})
+	if err != nil {
+		log.Fatalf("Failed to connect to Ninshu mesh: %v", err)
+	} else if r.Success {
+		fmt.Println(r.Reply)
+	} else {
+		fmt.Println("Already connected to Ninshu mesh")
+	}
+}
+
+func disconnect() {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Could not dial-in to server: %v\n Is the daemon running?", err)
+	}
+	defer conn.Close()
+	c := pb.NewClusterClient(conn)
+	// Contact daemon
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	r, err := c.RaiseAnchor(ctx, &pb.EmptyRequest{})
+	if err != nil {
+		log.Fatalf("RPC failed: %v\n", err)
+	}
+	if r.Success {
+		fmt.Println("Successfully disconnected from Ninshu mesh")
+	}
+}
 
 func main() {
 	args := os.Args[1:] // ignore script location
@@ -65,10 +144,23 @@ func main() {
 	os.Setenv("ninRootPath", viper.GetString("ninRootPath"))
 	// parse command
 	switch args[0] {
+	case "anchor":
+		if len(args) < 2 {
+			com.FetchHelp(args)
+		} else {
+			anchor(args)
+		}
 	case "configure":
 		fmt.Println("Configure Ninshu client and network")
 	case "connect":
-		fmt.Println("Connect to Ninshu network")
+		if len(args) < 2 {
+			com.FetchHelp(args)
+		} else {
+			fmt.Println("Attempting to connect to Ninshu network...")
+			connectTo(args[1])
+		}
+	case "disconnect":
+		disconnect()
 	case "version":
 		fmt.Printf("Ninshu %s へようこそ\n", tag)
 	case "help":
