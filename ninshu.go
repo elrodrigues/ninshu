@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	tag      = "v0.1"
+	tag      = "v0.1.5"
 	help_msg = `Ninshu Client is a tool for interacting with your Ninshu network
 
 Usage:
@@ -57,7 +57,7 @@ func anchor(args []string) {
 
 	switch args[1] {
 	case "drop":
-		r, err := c.DropAnchor(ctx, &pb.ConnectRequest{HostIP: os.Getenv("hostIP")})
+		r, err := c.DropAnchor(ctx, &pb.ConnectRequest{HostIP: os.Getenv("hostIP"), Ip: ""})
 		if err != nil {
 			log.Fatalf("RPC failed: %v\n", err)
 		}
@@ -92,7 +92,9 @@ func connectTo(ip string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	r, err := c.ConnectTo(ctx, &pb.ConnectRequest{HostIP: os.Getenv("hostIP"), Ip: &ip})
+	fmt.Printf("Host IP: %s\n", os.Getenv("hostIP"))
+	fmt.Printf("Target IP: %s\n", ip)
+	r, err := c.ConnectTo(ctx, &pb.ConnectRequest{HostIP: os.Getenv("hostIP"), Ip: ip})
 	if err != nil {
 		log.Fatalf("Failed to connect to Ninshu mesh: %v", err)
 	} else if r.Success {
