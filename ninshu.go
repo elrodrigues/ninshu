@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -33,6 +34,7 @@ The commands are:
 	disconnect	disconnect from Ninshu network
 	version		prints Ninshu version
 	help		prints this help message or command info
+	list		prints list of all members in network
 	ping		pong
 
 Use "ninshu help <command>" for more information about a command
@@ -124,6 +126,34 @@ func disconnect() {
 	}
 }
 
+func getMembers() {
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Could not dial-in to server: %v\n Is the daemon running?", err)
+	}
+	defer conn.Close()
+	c := pb.NewClusterClient(conn)
+	// Contact daemon
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	stream, err := c.GetMembers(ctx, &pb.EmptyRequest{})
+	if err != nil {
+		log.Fatalf("ninshu.getMembers(_):: %v", err)
+	}
+	fmt.Println("Member-list for current Ninshu network:")
+	for {
+		member, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("ninshu.getMembers(_): %v", err)
+		}
+		fmt.Println(*member.Reply)
+	}
+}
+
 func main() {
 	args := os.Args[1:] // ignore script location
 
@@ -165,16 +195,14 @@ func main() {
 		}
 	case "disconnect":
 		disconnect()
-	case "version":
-		fmt.Printf("Ninshu %s へようこそ\n", tag)
 	case "help":
 		if len(args) < 2 {
 			fmt.Print(help_msg)
 		} else {
 			com.FetchHelp(args[1:])
 		}
-	case "tskr":
-		fmt.Print(help_msg)
+	case "list":
+		getMembers()
 	case "ping":
 		conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -190,6 +218,10 @@ func main() {
 			log.Fatalf("RPC failed: %v\n", err)
 		}
 		fmt.Println(r.Pong)
+	case "tskr":
+		fmt.Print(help_msg)
+	case "version":
+		fmt.Printf("Ninshu %s へようこそ\n", tag)
 	default:
 		fmt.Fprint(os.Stderr, help_msg)
 		os.Exit(2)

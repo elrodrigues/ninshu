@@ -17,6 +17,7 @@ The commands are:
 	connect		connect to Ninshu network
 	version		prints Ninshu version
 	help		prints this help message or command info
+	list		prints list of all members in network
 	ping		pong
 `
 
