@@ -3,7 +3,7 @@ module github.com/elrodrigues/ninshu
 go 1.18
 
 require (
-	github.com/elrodrigues/ninshud v0.0.0-20220523020451-2d4871414f5b
+	github.com/elrodrigues/ninshud v0.1.1-pre
 	github.com/spf13/viper v1.10.1
 	google.golang.org/grpc v1.45.0
 )
