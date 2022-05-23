@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	tag      = "v0.1.5"
+	tag      = "v0.1.6"
 	help_msg = `Ninshu Client is a tool for interacting with your Ninshu network
 
 Usage:
