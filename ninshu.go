@@ -1,4 +1,4 @@
-package ninshu
+package main
 
 import (
 	"context"
